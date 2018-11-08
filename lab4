@@ -38,7 +38,7 @@ int main() {
     for (q=0;q<n;q++) {
        nextset(b,j);
        for (i=0;i<j;i++) printf("%d",b[i]);
-        printf("\n");
+       printf("\n");
     }
     return 0;
 }
