@@ -4,7 +4,7 @@
 
 void tableofshifts(const unsigned char sample[],int table[]){
     int i=0,sizes=strlen(sample);
-    for(;i<256;++i) table[i]=sizes;
+    for(;i<255;++i) table[i]=sizes;
     table[(int)(sample[sizes-1])]=sizes;
     for (i=0;i<sizes-1;++i) table[(int)(sample[i])]=sizes-i-1;
 }
