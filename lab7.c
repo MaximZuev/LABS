@@ -131,10 +131,10 @@ int main() {
 
     for (i = 0; i < N; i++){
         freestack(graph[i]);
-        free(graph[i]);
     }
     freestack(top);
     free(visited);
+    free(graph);
 
     return 0;
 }
