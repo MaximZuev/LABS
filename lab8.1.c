@@ -129,7 +129,6 @@ int main() {
         }
     }else{
         printf("no spanning tree");
-        exit(0);
     }
 
     free(visited);
