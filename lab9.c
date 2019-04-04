@@ -35,7 +35,7 @@ void readin(FILE **in, FILE **out, int *N, int *n, int *S, int *F, long **graph)
         fprintf(*out, "bad vertex");
         exit(0);
     }
-    *graph = (long *) malloc(*N * *N * sizeof(long));
+    *graph = malloc(*N * *N * sizeof(long));
     for (i = 0; i < *N; ++i){
         for (j = 0; j < *N; ++j){
             *(*graph + i * *N +j) = 0;
@@ -45,19 +45,19 @@ void readin(FILE **in, FILE **out, int *N, int *n, int *S, int *F, long **graph)
         if (fscanf(*in, "%d%d%li", &b, &e, &l) != EOF) {
             if ((b < 1) || (b > *N) || (e < 1) || (e > *N)) {
                 fprintf(*out, "bad vertex");
-                free(graph);
+                free(*graph);
                 exit(0);
             }
             if ((l > INT_MAX) || (l < 0)) {
                 fprintf(*out, "bad length");
-                free(graph);
+                free(*graph);
                 exit(0);
             }
             *(*graph + (b - 1) * *N +(e - 1)) = l;
             *(*graph + (e - 1) * *N +(b - 1)) = l;
         } else {
             fprintf(*out, "bad number of lines");
-            free(graph);
+            free(*graph);
             exit(0);
         }
     }
@@ -65,7 +65,7 @@ void readin(FILE **in, FILE **out, int *N, int *n, int *S, int *F, long **graph)
 
 void printd(FILE *out, long long *d, int N){
     for (int i = 0; i < N; ++i) {
-        if (d[i] != LONG_LONG_MAX) {
+        if (d[i] != LLONG_MAX) {
             if (d[i] <= INT_MAX) {
                 fprintf(out, "%lli ", d[i]);
             } else {
@@ -85,7 +85,7 @@ void findd(int N, const long *graph, long long *d, short *visited){
     long long temp, minl;
     do {
         minindex = INT_MAX;
-        minl = LONG_LONG_MAX;
+        minl = LLONG_MAX;
         for (i = 0; i < N; ++i){
             if ((visited[i] == 1) && (d[i] < minl)){
                 minl = d[i];
@@ -123,7 +123,7 @@ void recovery_path(FILE *out, int *path, int F, int N, const long long *d, const
         }
     }
     for(i = 0; i < N; i++){
-        if ((d[i] >= INT_MAX) && (d[i] != LONG_LONG_MAX)) {
+        if ((d[i] >= INT_MAX) && (d[i] != LLONG_MAX)) {
             check++;
         }
     }
@@ -155,14 +155,14 @@ int main() {
 
     d = (long long *) malloc(N * sizeof(long long));
     for (i = 0; i < N; ++i){
-        d[i] = LONG_LONG_MAX;
+        d[i] = LLONG_MAX;
     }
     d[S - 1] = 0;
 
     findd(N, graph, d, visited);
     printd(out, d, N);
     if (F != S) {
-        if (d[F - 1] != LONG_LONG_MAX) {
+        if (d[F - 1] != LLONG_MAX) {
             recovery_path(out, path, F, N, d, graph);
         } else {
             fprintf(out, "no path");
