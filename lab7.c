@@ -2,65 +2,49 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-typedef struct stack
+typedef struct Node
 {
-    int data;
-    struct stack *next;
-}stack;
+    int value;
+    struct Node *next;
+}spisok;
 
-stack *makestack(int value)
+spisok *create(int data){
+    spisok *tmp = (spisok *) malloc(sizeof(spisok));
+    tmp -> value = data;
+    tmp -> next = NULL;
+    return tmp;
+}
+void add_element_start(spisok **head, int data)
 {
-    stack *stack1 = (stack *) malloc(sizeof(stack));
-    stack1->data = value;
-    return stack1;
+    spisok *tmp = (spisok *) malloc(sizeof(spisok));
+    tmp -> value = data;
+    tmp -> next = *head;
+    *head = tmp;
 }
 
-void s_push(stack **top, int value)
+void *remove_all(spisok *head)
 {
-    stack *q;
-    q=makestack(value);
-    if (top == NULL) {
-        *top = q;
-    }
-    else{
-        q->next = *top;
-        *top = q;
-    }
-}
-
-void s_print(stack *top) {
-    stack *q = top;
-    while (q) {
-        printf("%d ", q->data);
-        q = q->next;
+    while(head != NULL){
+        spisok *p = head;
+        head = head -> next;
+        free(p);
     }
 }
 
-void freestack(stack *top)
-{
-    if (top == NULL) {
-        return;
-    }
-    freestack(top->next);
-    free(top);
-}
-
-void check_vertex(int v, int N)
-{
-    if ((v < 1) || (v > N)){
-        printf("bad vertex");
-        exit(0);
-    }
-}
-
-void dynamic_array_initialize(stack **A, int N, int n)
+void dynamic_array_initialize(spisok **A, int N, int n)
 {
     int b, e;
     for (int i = 0; i < n; i++){
         if (scanf("%d%d", &b, &e) != EOF) {
-            check_vertex(b, N);
-            check_vertex(e, N);
-            s_push(&A[b-1], e);
+            if ((b < 1) || (b > N) || (e < 1) || (e > N)){
+                printf("bad vertex");
+                exit(0);
+            }
+            if (A[b - 1] == NULL){
+                A[b - 1] = create(e);
+            } else {
+                add_element_start(&A[b - 1], e);
+            }
             if (b == e){
                 printf("impossible to sort");
                 exit(0);
@@ -72,26 +56,28 @@ void dynamic_array_initialize(stack **A, int N, int n)
     }
 }
 
-void DFS(int start, int *visited, stack **graph,  int N, stack **top)
+void DFS(int start, int *visited, spisok **graph,  int N, int *k, int *sort_g)
 {
+    spisok *p = graph[start - 1];
     visited[start-1] = 1;
-    while (graph[start - 1]) {
-        if (visited[(graph[start - 1]->data) - 1] == 0) {
-            DFS(graph[start - 1]->data , visited, graph, N, top);
+    while (p) {
+        if (visited[(p -> value) - 1] == 0) {
+            DFS(p -> value , visited, graph, N, k, sort_g);
         }
-        if (visited[(graph[start - 1]->data) - 1] == 1) {
+        if (visited[(p -> value) - 1] == 1) {
             printf("impossible to sort");
             exit(0);
         }
-        graph[start - 1] = graph[start - 1]->next;
+        p = p -> next;
     }
     visited[start-1] = 2;
-    s_push(top, start);
+    sort_g[*k] = start;
+    *k = *k + 1;
 }
 
 int main() {
-    int i, N, n, *visited;
-    stack ** graph, * top = NULL;
+    int i, N, n, *visited, *sort_g, k = 0;
+    spisok ** graph;
 
     if (scanf("%d", &N) == EOF) {
         printf("bad number of lines");
@@ -105,17 +91,16 @@ int main() {
         printf("bad number of vertices");
         exit(0);
     }
-    if ((n < 0) || (n > N*(N+1)/2)){
+    if ((n < 0) || (n > N * (N + 1) / 2)){
         printf("bad number of edges");
         exit(0);
     }
 
-    visited = (int *)malloc(N*sizeof(int));
-    for(i = 0; i < N; i++){
-        visited[i] = 0;
-    }
+    sort_g = (int *) malloc(N * sizeof(int));
 
-    graph = (stack **) malloc(N*sizeof(stack *));
+    visited = (int *) calloc(N, sizeof(int));
+
+    graph = (spisok **) malloc(N * sizeof(spisok *));
     for(i = 0; i < N; i++){
         graph[i] = NULL;
     }
@@ -123,18 +108,18 @@ int main() {
 
     for (i = 0; i < N; i++) {
         if (visited[i] != 2) {
-            DFS(i + 1, visited, graph, N, &top);
+            DFS(i + 1, visited, graph, N, &k, sort_g);
         }
     }
-
-    s_print(top);
+    for(i = N - 1; i >= 0; i--){
+        printf("%d ", sort_g[i]);
+    }
 
     for (i = 0; i < N; i++){
-        freestack(graph[i]);
+        remove_all(graph[i]);
     }
-    freestack(top);
+    free(sort_g);
     free(visited);
     free(graph);
-
     return 0;
 }
