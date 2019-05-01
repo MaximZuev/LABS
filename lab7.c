@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <malloc.h>
 #include <stdlib.h>
 
 typedef struct Node
@@ -22,7 +21,7 @@ void add_element_start(spisok **head, int data)
     *head = tmp;
 }
 
-void *remove_all(spisok *head)
+void remove_all(spisok *head)
 {
     while(head != NULL){
         spisok *p = head;
